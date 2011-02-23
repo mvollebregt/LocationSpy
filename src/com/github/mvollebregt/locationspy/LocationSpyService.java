@@ -17,13 +17,13 @@ package com.github.mvollebregt.locationspy;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.IBinder;
 import com.github.mvollebregt.locationspy.gtalk.GtalkStatusUserLocationPublisher;
-import com.github.mvollebregt.locationspy.location.TravelListener;
 import com.github.mvollebregt.locationspy.wifi.WifiConnectionListener;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -39,15 +39,11 @@ public class LocationSpyService extends Service implements UserLocationListener 
     UserLocationDetector[] detectors;
     List<UserLocationPublisher> publishers;
 
-    private Properties readProperties(String filename) throws IOException {
+    private Properties readProperties(int resource) throws IOException {
+        Resources resources = this.getResources();
+        InputStream rawResource = resources.openRawResource(resource);
         Properties properties = new Properties();
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(filename);
-            properties.load(in);
-        } finally {
-            if (in != null) in.close();
-        }
+        properties.load(rawResource);
         return properties;
     }
 
@@ -56,7 +52,7 @@ public class LocationSpyService extends Service implements UserLocationListener 
         // read locations from settings
         Properties locations = null;
         try {
-            locations = readProperties("location.properties");
+            locations = readProperties(R.raw.location);
         } catch (IOException e) {
             // TODO: proper exception handling
             e.printStackTrace();
@@ -68,7 +64,7 @@ public class LocationSpyService extends Service implements UserLocationListener 
         // read username and password from settings
         Properties accounts = null;
         try {
-            accounts = readProperties("account.properties");
+            accounts = readProperties(R.raw.account);
         } catch (IOException e) {
             // TODO: proper exception handling
             e.printStackTrace();
